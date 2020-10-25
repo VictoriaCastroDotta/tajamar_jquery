@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+    <h1 align="center"> Práctica Hospitales CRUD </h1>
+    <br />
+    <div class=".container-fluid">
+        <fieldset align="center">
+            <form class="form-group">
+                <label> Id Hospital: </label>
+                <input type="text" id="idhospital" />
+                <label> Nombre: </label>
+                <input type="text" id="nombrehospital" />
+                <label> Dirección: </label>
+                <input type="text" id="direchospital" />
+                <label> Teléfono: </label>
+                <input type="text" id="telefonohospital" />
+                <label> Número de camas: </label>
+                <input type="text" id="camashospital" />
+                <br /><br />
+                <button type="button" id="insertar" class="btn btn-primary"> Insertar </button>
+                <button type="button" id="modificar" class="btn btn-warning"> Modificar </button>
+                <h3 id="mensaje"> </h3>
+            </form>
+        </fieldset>
+    </div>
+
+    <br />
+    <div class="container">
+        <table id="tablahosp" class="table table-dark">
+            <thead>
+                <tr>
+                    <th> Id Hospital </th>
+                    <th> Nombre </th>
+                    <th> Dirección </th>
+                    <th> Teléfono </th>
+                    <th> Número de camas </th>
+                    <th> Eliminar</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+        var urlapi = "https://apicrudhospital.azurewebsites.net";
+        $(document).ready(function () {
+
+            cargarHospitales();
+
+            $("#insertar").click(function () {
+                var idNuevo = $("#idhospital").val();
+                var nombre = $("#nombrehospital").val();
+                var direccion = $("#direchospital").val();
+                var tel = $("#telefonohospital").val();
+                var camas = $("#camashospital").val();
+                var request = "/webresources/hospitales/post";
+
+                //Creo objeto hospital
+                var hospital = new Object();
+                hospital.idhospital = parseInt(idNuevo);
+                hospital.nombre = nombre;
+                hospital.direccion = direccion;
+                hospital.telefono = tel;
+                hospital.camas = camas;
+
+                //Convierto a JSON EL hospital
+                var json = JSON.stringify(hospital);
+                //Hago peticion con AJAX para insertarlo
+                $.ajax({
+                    "url": urlapi + request
+                    , "type": "POST"
+                    , "contentType": "application/json"
+                    , "data": json
+                    , "success": function (data) {
+                         $("#mensaje").text("Departamento insertado");
+                        cargarHospitales();
+                    }
+
+                })//fin ajax
+
+            }); //fin insertar
+
+            $("#modificar").click(function () {
+                var idNuevo = $("#idhospital").val();
+                var nombre = $("#nombrehospital").val();
+                var direccion = $("#direchospital").val();
+                var tel = $("#telefonohospital").val();
+                var camas = $("#camashospital").val();
+                var request = "/webresources/hospitales/put";
+
+                var hospital = new Object();
+                hospital.idhospital = parseInt(idNuevo);
+                hospital.nombre = nombre;
+                hospital.direccion = direccion;
+                hospital.telefono = tel;
+                hospital.camas = camas;
+
+                //Convierto a JSON EL hospital
+                var json = JSON.stringify(hospital);
+                //Hago peticion con AJAX para modificarlo
+                $.ajax({
+                    "url": urlapi + request
+                    , "type": "PUT"
+                    , "contentType": "application/json"
+                    , "data": json
+                    , "success": function (data) {
+                         $("#mensaje").text("Departamento modificado");
+                        cargarHospitales();
+                    }
+
+                })//fin ajax
+
+
+            })// fin modificar
+
+        });//fin ready
+
+        function cargarHospitales() {
+            var request = "/webresources/hospitales";
+            $.ajax({
+                "url": urlapi + request
+                , "method": "GET"
+                , "success": function (data) {
+                    $("#tablahosp tbody").empty();
+                    $.each(data, function (index, hosp) {
+                        console.log("dentro");
+                        var idHosp = hosp.idhospital;
+                        var tr = $("<tr>");
+                        var tdId = $("<td>", { "text": hosp.idhospital });
+                        var tdNombre = $("<td>", { "text": hosp.nombre });
+                        var tdDireccion = $("<td>", { "text": hosp.direccion });
+                        var tdTel = $("<td>", { "text": hosp.telefono });
+                        var tdCamas = $("<td>", { "text": hosp.camas });
+                        var link = $("<a>", { "text": "Eliminar", 'id': idHosp, "href":"#" });
+                        var tdEliminar = $("<td>");
+                        //console.log(hosp.direccion);
+                        tdEliminar.append(link);
+                        tr.append(tdId);
+                        tr.append(tdNombre);
+                        tr.append(tdDireccion);
+                        tr.append(tdTel);
+                        tr.append(tdCamas);
+                        tr.append(tdEliminar);
+                        $("#tablahosp tbody").append(tr);
+                        link.click(function () {
+                            var idSeleccion = $(this).attr("id");
+                            var request = "/webresources/hospitales/delete/" + idSeleccion;
+                            var borrar = confirm("¿Desea eliminar el hospital?");
+                            if (borrar == true) {
+                                $.ajax({
+                                "url": urlapi + request
+                                ,"method": "DELETE"
+                                , "success": function (data) {
+                                    $("#mensaje").text("Departamento: " + idSeleccion+ " eliminado");
+                                    cargarHospitales();
+                                }
+                            });
+                              }
+
+                        })
+                    })//fin each
+
+                }
+
+            });//fin ajax
+
+        }
+
+
+    </script>
+</body>
+</html>

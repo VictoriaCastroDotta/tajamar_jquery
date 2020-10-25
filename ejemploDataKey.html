@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body align="center">
+    <h1> Ejemplo Data Key </h1>
+    <button type="button" id="botonbotones"> Generar botones </button>
+    <button type="button" id="botoneslinks"> Generar links </button>
+    <h1 style="color:blue" id="resultado"></h1>
+    <hr />
+    
+
+    <div id="capabotones"> </div>
+    <hr />
+    <div id="capalinks"></div>
+
+
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script>
+
+        function generarNumeros() {
+            var aleat = parseInt((Math.random() * 100) + 1);
+            return aleat;
+        }
+
+        $(document).ready(function () {
+            $("#botonbotones").click(function () {
+                for (var i = 1; i <= 5; i++) {
+                    var boton = $("<button>", { "text": "Sorpresa", "value": generarNumeros() });
+                    $("#capabotones").append(boton);
+                    boton.click(function () {
+                        $("#resultado").text($(this).val());
+                    });
+                }
+
+            }); //fin click botonbotones
+
+            $("#botoneslinks").click(function () {
+                for (var i = 1; i <= 5; i++) {
+                    var link = $("<a>", {"text":"Sorpresa","href":"#", "data-valor":generarNumeros()})
+                    $("#capalinks").append(link);
+                    link.click(function () {
+                        var valor = $(this).data("valor");
+                        $("#resultado").text(valor);
+                    });
+                }
+
+            });
+
+
+        });// Fin document ready
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title> documento XML </title>
+</head>
+<body>
+    <h1> Documento XML con formato </h1>
+    <button type="button" onclick="realizarPeticion()"> Leer empleados.xml con formato </button>
+    <div id="contenido"></div>
+
+
+    <script type="text/javascript">
+
+        function realizarPeticion() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.addEventListener("load", mostrarDatos);
+            xhttp.open("GET", "xml/empleados.xml");
+            xhttp.send();
+        }
+
+        function mostrarDatos() {
+            //TENEMOS DOS PROPIEDADES QUE NOS INDICAN SI UNA PETICION HA SIDO CORRECTA 
+            //RECORDAMOS QUE AQUI ENTRA UNA VEZ HAYA FINALIZADO LA PETICION. YA SEA PETICION CORRECTA O INCORRECTA
+            //TENEMOS DOS PROPIEDADES EN EL OBJETO THIS:
+            //this.readystate --> si ha finalizado la lectura (4)
+            //this.status --> indica el codigo de la respuesta (404) 200
+            var contenido = document.getElementById("contenido");
+            if (this.readyState == 4 && this.status == 200) {
+                //EL OBJETO XMLrequest se puede manejar con los metodos del dom de html y dicho objeto tiene en la propiedad this.responseXML
+                var docxml = this.responseXML;
+                //Vamos a buscar un conjunto de nodos para aislar los apellidos (case sensitive)
+                var nodoApellido = docxml.getElementsByTagName("APELLIDO"); //--> devuelve un ARRAY y recorrerlo para coger lo que necesito
+                var html = "<ul>";
+                for (var i = 0; i < nodoApellido.length; i++) {
+                    //capturamos cada nodo apellido individual 
+                    var nodo = nodoApellido[i];
+                    //<APELLIDO> JIMENEZ </APELLIDO>
+                    //TODO NODO PUEDE TENER A LA VEZ HIJOS, EXISTE UNA PROPIEDAD PARA ACCEDER DE FORMA JERARQUICA A LOS HIJOS = childNodes[0]
+                    //Una vez que tenemos algun hijo podemos mostrar su valor o seguir bajando mas hijos
+                    //Existe una propiedad mas comoda cuando estamos en un nodo que tiene contenido, si el nodo tiene subelementos, nos devuelve tambien el contenido de los subelementos
+                    //.textContent (tengo que estar bien posicionado)
+                    var apellido = nodo.textContent;
+                    html += "<li>" + apellido + "</li>";
+
+                }
+
+
+                html += "</ul>";
+                contenido.innerHTML = html;
+            } else {
+                contenido.innerHTML = "<h1 style='color:red'> " + "la petición ha sido incorrecta: " + this.status + "</h1>";
+            }
+
+
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        .foto{
+            width:150px;
+            height:150px;
+            margin: 5px;
+        }
+
+    </style>
+</head>
+<body align="center">
+    <h1> Práctica posición de elementos dinámicos </h1>
+    <form>
+        <label> Selecciona cantidad de imágenes y botones </label>
+        <input type="range" min="1" max="10" name="rango" id="rango">
+        <span id="valorRango"> </span>
+    </form>
+    <br />
+    <div id="capabotones"></div>
+    <br />
+    <hr />
+    <br />
+    <div id="capaimagenes"></div>
+
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            $("#rango").change(function () {
+                var valorR = $(this).val();
+                //alert(valorR);
+                $("span").text(valorR);
+                $("#capabotones").empty();
+                $("#capaimagenes").empty();
+                for (var i = 1; i <= valorR; i++) {
+
+                    //CREO BOTONES
+                    var boton = $("<button>", { "type": "button", "text": "Imágen " + i, "data-id": i });
+                    $("#capabotones").append(boton);                    
+                    //CREO IMÁGENES
+                    var img = $("<img>", { "src": "img/flor1.jpg", "data-id": i,"class":"foto" });
+                    $("#capaimagenes").append(img);
+
+                    boton.click(function () {
+                        var valorBoton = $(this).data("id");
+                        var imagen = "img/flor2.jpg";
+                        document.images[valorBoton-1].src = "img/flor2.jpg";
+                       
+                    });
+                }
+
+            }); //fin change
+
+
+
+        }); //fin ready
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body align="center">
+    <h1> Búsqueda empleados JAVASCRIPT en un SELLECT </h1>
+    <form>
+        <select id="selectempleados" onchange="realizarPeticion();">
+            
+        </select>
+        <h1 style="color:blue" id="datooficio"> </h1>
+    </form>
+
+
+    <script type="text/javascript">
+        //AL CARGAR LA PÁGINA NECESITAMOS QUE LOS EMPLEADOS YA ESTEN CARGADOS EN EL <SELECT>
+        window.onload = function () {
+            var xhttp = new XMLHttpRequest();
+            xhttp.addEventListener("load", function () {
+                //AQUI EL CODIGO CUANDO TENGAMOS RESPUESTA DEL SREVIDOR
+                //AQUI CARGAMOS EL CONTROL <select>
+
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("peticion correcta");
+                    //BUSCAMOS EL SELECT DONDE AÑADIREMOS LOS APELLIDOS
+                    var select = document.getElementById("selectempleados");
+                    var nodoapellido = this.responseXML.getElementsByTagName("APELLIDO");
+                    for (var nodoape of nodoapellido) {
+                        var apellido = nodoape.textContent;
+                        var option = document.createElement("option");
+                        option.innerText = apellido;
+                        option.value = apellido;
+                        select.appendChild(option);
+                    }
+                } 
+
+            });
+
+            xhttp.open("GET", "xml/datosempleados.xml");
+            xhttp.send();
+        }
+
+        function realizarPeticion() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.addEventListener("load", leerEmpleados);
+            xhttp.open("GET", "xml/datosempleados.xml");
+            xhttp.send();
+        }
+
+        function leerEmpleados() {
+            if (this.readyState == 4 && this.status == 200) {
+                //NECESITAMOS AVERIGUAR EL OPTION SELECCIONADO DEL SELECT
+                var select = document.getElementById("selectempleados");
+                //NECESITAMOS LA POSICION DEL ELEMENTO SELECCIONADO
+                var posicion = -1;
+                for (var i = 0; i < select.options.length; i++) {
+                    var opt = select.options[i];
+                    if (opt.selected == true) {
+                        //NECESITAMOS LA POSICION DE ELEMENTO
+                        posicion = i;
+                        break;
+                    }
+                }
+
+                //nos centramos en el documento xml --> recuperar el oficio
+                var docxml = this.responseXML;
+                var nodosempleados = docxml.getElementsByTagName("EMPLEADO");
+                var empleado = nodosempleados[posicion];
+
+                //con childNodes[] accedemos a los hijos
+                var apellido = empleado.getElementsByTagName("APELLIDO")[0].textContent;
+                //var apellido = empleado.childNodes[1].textContent; //--> nodeName : saca el nombre de la etiqueta literal
+                //var oficio = empleado.childNodes[3].textContent;
+                var oficio = empleado.getElementsByTagName("OFICIO")[0].textContent;
+                document.getElementById("datooficio").innerText = apellido + ", " + oficio;
+
+
+
+            }
+
+        }
+
+
+    </script>
+</body>
+</html>

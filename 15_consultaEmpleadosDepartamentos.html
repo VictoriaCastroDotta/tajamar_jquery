@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body align="center">
+
+    <h1 align="center"> Consultar servicios de Empleados y Departamentos </h1>
+    <hr />
+
+    <div id="datosdepa"></div>
+    <div id="datosempleados"></div>
+
+    <!--<table align="center" id="tabla" border="1" class="table">
+        <thead>
+            <tr>
+                <th> Id Empleado </th>
+                <th> Apellido </th>
+                <th> Oficio </th>
+                <th> Salario </th>
+                <th> Departamento </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>-->
+
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+        var urlapidep = "https://apicruddepartamentoscore.azurewebsites.net";
+        var urlapiemp = "https://apiempleadosspgs.azurewebsites.net";
+        $(document).ready(function () {
+            
+                //console.log("dentro");
+                var request = "/api/departamentos";
+                $.getJSON(urlapidep + request, function (data) {
+                    var html = "";
+                    html += "<h3 align='center'> Listado de departamentos</h3>";
+                    html += "<table align='center' id='tabla' border='1' class='table'>";
+                    html += "<thead class='thead-dark'><tr align='center'> <th> Numero </th> <th> Nombre </th> <th> Localidad </th></tr></thead>";
+                    html += "<tbody>";
+                    $.each(data, function (index, dep) { 
+                        
+                        html += "<tr align='center'>";
+                        html += "<td>" + dep.numero + "</td>";
+                        html += "<td class='dep' ><span id=" + dep.numero + " >" + dep.nombre + "</a></td>";
+                        html += "<td>" + dep.localidad + "</td>";
+                        html += "</tr>";
+                       
+                    }); //fin each
+                    html += "</tbody>";
+                    html += "</table>";                  
+                    $("#datosdepa").html(html);
+                    //$(document).on('click', '.dep', function () {
+                    //    //alert("hola");
+                    //    $.each()
+                    //});
+
+                    $("span").on('click', function () {
+                        var id= $(this).attr("id");
+                        var request2 = "/api/Empleados";
+                        $.ajax({
+                            "url": urlapiemp + request2                            
+                            , "type": "GET"
+                            , "success": function (data) {
+                                var datos = "";
+                                datos += "<br><br><h3 align='center'> Listado de Empleados del departamento: " + id + "</h3>";
+                                datos += "<table align='center' id='tabla' border='1' class='table'>";
+                                datos += "<thead class='thead-light'><tr align='center'> <th> Id empleado </th> <th> Apellido </th> <th> Oficio </th><th> Salario </th><th> Departamento </th></tr></thead>";
+                                datos += "<tbody>";
+                                $.each(data, function (index, emp) {
+                                    console.log("dentro");                                   
+                                    if (emp.departamento == id) {
+                                        datos += "<tr align='center'>";
+                                        datos += "<td>" + emp.idEmpleado + "</td>";
+                                        datos += "<td>" + emp.apellido + "</td>";
+                                        datos += "<td>" + emp.oficio + "</td>";
+                                        datos += "<td>" + emp.salario + "</td>";
+                                        datos += "<td>" + emp.departamento + "</td>";
+                                        datos += "</tr>";
+                                        //console.log(emp.idEmpleado);
+                                    }
+                                });
+                                datos += "</tbody>";
+                                datos += "</table>";       
+
+                                $("#datosempleados").html(datos);
+
+
+                            }
+
+                        });
+                        
+                    }); 
+
+                    
+                });
+            
+
+        });
+
+    </script>
+</body>
+</html>

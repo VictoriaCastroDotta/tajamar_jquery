@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+</head>
+<body>
+    <div class="container">
+        <h1> Empleados </h1>
+        <form class="form-control">
+            <select id="selectoficio"></select>
+        </form>
+        <br /><br />
+        <table id="tablaEmp" class="table table-dark">
+            <thead>
+                <tr>
+                    <th> Apellido</th>
+                    <th> Oficio </th>
+                    <th> Fecha Alta </th>
+                    <th> Salario</th>
+                    <th> Departamento </th>
+                    <th> Salario Anual </th>
+                    <th> Antiguedad </th>
+                    <th> Salario total cobrado </th>
+                    <th> Detalles </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/empleados.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+        var urlapi = "https://apipracticaempleados.azurewebsites.net/";
+        $(document).ready(function () {
+            cargarOficios();
+            $("#selectoficio").change(function () {
+                $("#tablaEmp tbody").html("");
+                var oficio = $(this).val();
+                //alert(oficio);
+                var request = "api/Empleados/EmpleadosOficio/" + oficio;
+                $.ajax({
+                    "url": urlapi + request
+                    , "method": "GET"
+                    , "success": function (data) {
+                        
+                        $.each(data, function (index, emp) {
+                            var empe = new Empleado(emp.idempleado,emp.apellido,emp.oficio,emp.fechaalta,emp.salario,emp.departamento);                           
+                            var tr = $("<tr>");
+                            var tdApellido = $("<td>", { "text": empe.apellido });
+                            var tdOficio = $("<td>", { "text": empe.oficio });
+                            var tdFechaAlta = $("<td>", { "text": empe.fechaalta });
+                            var tdSalario = $("<td>", { "text": empe.salario });
+                            var tdDepartamento = $("<td>", { "text": empe.departamento });
+                            var tdSalarioAnual = $("<td>", { "text": empe.salarioAnual() });
+                            var tdAnti = $("<td>", { "text": empe.antiguedad() });
+                            var tdSalarioTotal = $("<td>", { "text": empe.salarioTotal() });
+                            var link = $("<a>", { "text": "Detalles", 'id': empe.idempleado, "href": "#" });
+                            //console.log(empe.idempleado);
+                            link.click(function () {
+                                var req = "api/Empleados/" + $(this).attr("id");
+                                console.log(link.attr("id"));
+                                $.ajax({
+                                    "url": urlapi + req
+                                    , "method": "GET"
+                                    , "success": function (data) {
+                                        //console.log(data.idempleado);
+                                        console.log(data.apellido);
+                                        var empe = new Empleado(data.idempleado, data.apellido, data.oficio, data.fechaalta, data.salario, data.departamento);                           
+                                        alert("id: " + empe.idempleado + "\n" +
+                                            "apellido: " + empe.apellido + "\n" +
+                                            "oficio: " + empe.oficio + "\n" +
+                                            "fecha alta: " + empe.fechaalta + "\n" +
+                                            "salario: " + empe.fechaalta + "\n" +
+                                            "departamento: " + empe.departamento + "\n" +
+                                            "salario anual: " + empe.salarioAnual() + "\n" +
+                                            "antiguedad: " + empe.antiguedad() + "\n" +
+                                            "salario total: " + empe.salarioTotal() + "\n");
+ 
+                                    }
+
+                                });
+                            });
+                            var tdDetalles = $("<td>");
+                        console.log("Pintar tabla");
+                        tdDetalles.append(link);
+                        tr.append(tdApellido);
+                        tr.append(tdOficio);
+                        tr.append(tdFechaAlta);
+                        tr.append(tdSalario);
+                        tr.append(tdDepartamento);
+                        tr.append(tdSalarioAnual);
+                        tr.append(tdAnti);
+                        tr.append(tdSalarioTotal);
+                        tr.append(tdDetalles);
+                        $("#tablaEmp tbody").append(tr);
+                      }); // fin each
+                    }
+
+                });
+
+            });
+
+        }); //fin ready
+
+        function cargarOficios() {
+            var request = "/api/Empleados";
+            $.ajax({
+                "url": urlapi + request
+                , "method": "GET"
+                , "success": function (data) {
+                    var arrayOficios = new Array();
+                    $.each(data, function (index, emp) {
+                        if (index == 0) {
+                            arrayOficios.push(emp.oficio);
+                        } else {
+                            var aux = 0;
+                            for (var i = 0; i < arrayOficios.length; i++) {
+                                console.log("dentro");
+                                if (arrayOficios[i] != emp.oficio) {
+                                    aux = 1; //no existe
+                                } else {
+                                    aux = 0; //existe
+                                    break;
+                                }
+                            }
+
+                            if (aux == 1) {
+                                arrayOficios.push(emp.oficio);
+                            }
+
+                        }
+                        
+                        
+                    }); //fin each
+
+                    for (var i = 0; i < arrayOficios.length; i++) {
+
+                        var option = $("<option>", { text: arrayOficios[i], "value": arrayOficios[i] });
+                        option.appendTo($("#selectoficio"));
+                    }
+                }
+
+            });//fin ajax
+
+        }
+
+
+    </script>
+</body>
+</html>
+
